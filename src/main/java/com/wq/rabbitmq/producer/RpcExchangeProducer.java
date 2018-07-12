@@ -30,7 +30,8 @@ public class RpcExchangeProducer implements ExchangeProducer<String> {
     @Override
     public void bindExchangeAndSend(MQMessageWrapper<String> wrapper, Set<String> routingKeys) {
         logger.debug("rpc client produce a message and will send to server");
-        rpcInvoker.callRpcMethod(wrapper.getMessageBody());
+        MQMessageWrapper<String> result = rpcInvoker.callRpcMethod(wrapper.getMessageBody());
+        logger.info("RPC result --> " + result);
     }
 
     @Override

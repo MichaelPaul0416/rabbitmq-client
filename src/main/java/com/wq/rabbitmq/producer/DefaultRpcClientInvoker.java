@@ -88,7 +88,7 @@ public class DefaultRpcClientInvoker implements RpcInvoker<String, MQMessageWrap
         MQMessageWrapper<String> messageWrapper = (MQMessageWrapper<String>) map.get("wrapper");
         this.rpcResults.put(messageWrapper.getUuid(), messageWrapper);
         logger.info("得到uuid为[" + messageWrapper.getUuid() + "]的RPC计算结果[" + messageWrapper.getMessageBody() + "]");
-        Envelope envelope = (Envelope) map.get("envelop");
+        Envelope envelope = (Envelope) map.get("envelope");
         try {
             this.channel.basicAck(envelope.getDeliveryTag(), false);
         } catch (IOException e) {
