@@ -30,8 +30,8 @@ public class SimpleMessageProducerTest extends BaseRabbitmqTest {
     @Override
     protected void doInit() {
         //空的交换机，消息发送到队列名为routingKey的值的队列上
-//        super.messageInvoker = new SimpleMessageProducer("rabbitmq-queue-default","","default-routing-key","");
-//        ((SimpleMessageProducer) super.messageInvoker).setExchangeProducer(new DefaultNullExchangeProducer());
+        super.messageInvoker = new SimpleMessageProducer("rabbitmq-queue-default","",set,"");
+        super.messageInvoker.setExchange(new DefaultNullExchangeProducer());
 
         //非空交换机，发送到指定队列名称上
 //        super.messageInvoker = new SimpleMessageProducer("rabbitmq-queue-fanout-3","rabbit-exchange-fanout","","fanout");//订阅模式
@@ -40,7 +40,7 @@ public class SimpleMessageProducerTest extends BaseRabbitmqTest {
 //        builderDirectQueues("direct", SEND_SUB_QUEUE_NAME[0]);//为三种队列分别创建5个队列
 
 
-        builderTopicQueues("topic", SEND_SUB_QUEUE_NAME[0], set);//使用topic的exchange，队列名为rabbitmq-queue-topic-delete,绑定两个routingkey
+//        builderTopicQueues("topic", SEND_SUB_QUEUE_NAME[0], set);//使用topic的exchange，队列名为rabbitmq-queue-topic-delete,绑定两个routingkey
 
     }
 
@@ -57,9 +57,18 @@ public class SimpleMessageProducerTest extends BaseRabbitmqTest {
 
     @Override
     protected void setExchanger() {
-        ((SimpleMessageProducer) messageInvoker).setExchange(new DefaultExchangeProducer());
+//        messageInvoker.setExchange(new DefaultExchangeProducer());//exchange is not null
+        messageInvoker.setExchange(new DefaultNullExchangeProducer());//use default exchange --> routing message to the queue which name is the value of routing key
     }
 
+
+
+    @Test
+    public void sendEmptyExchange(){
+        MQMessageWrapper<String> wrapper = new MQMessageWrapper<>();
+        wrapper.setMessageBody("empty exchange");
+        ((MessageProducer)messageInvoker).sendMessage(wrapper,set);
+    }
 
     @Test
     public void sendMessage() {

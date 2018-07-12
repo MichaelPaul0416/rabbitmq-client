@@ -5,6 +5,7 @@ import com.wq.rabbitmq.common.DeliveryStrategy;
 import com.wq.rabbitmq.common.exchange.ExchangeProducer;
 import com.wq.rabbitmq.common.MQMessageWrapper;
 import com.wq.rabbitmq.common.RabbitMqBasic;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Set;
@@ -20,6 +21,7 @@ public class DefaultExchangeProducer implements ExchangeProducer<String> {
     private Channel channel;
     private RabbitMqBasic rabbitMqBasic;
 
+    private Logger logger = Logger.getLogger(getClass());
 
     @Override
     public void bindExchangeAndSend(MQMessageWrapper<String> wrapper, Set<String> routingKeys) {
@@ -52,6 +54,11 @@ public class DefaultExchangeProducer implements ExchangeProducer<String> {
              * 参数4：交换机在不被使用时是否删除
              * 参数5：交换机的其他属性
              */
+
+            if("".equals(this.rabbitMqBasic.getExchangeName())){
+                logger.debug("use default exchange and it's type is direct");
+                return;
+            }
             channel.exchangeDeclare(this.rabbitMqBasic.getExchangeName(),this.rabbitMqBasic.getDelivery().name,true,true,null);
             System.out.println("producer delivery type --> " + this.rabbitMqBasic.getDelivery().name);
             if(!DeliveryStrategy.TOPIC.equals(rabbitMqBasic.getDelivery())) {
@@ -62,7 +69,7 @@ public class DefaultExchangeProducer implements ExchangeProducer<String> {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
     }
 }
