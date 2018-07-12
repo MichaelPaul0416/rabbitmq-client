@@ -1,6 +1,8 @@
 package com.wq.rabbitmq.producer;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.MessageProperties;
 import com.wq.rabbitmq.common.exchange.ExchangeProducer;
 import com.wq.rabbitmq.common.MQMessageWrapper;
 import com.wq.rabbitmq.common.RabbitMqBasic;
@@ -18,8 +20,16 @@ public class DefaultNullExchangeProducer implements ExchangeProducer<String> {
 
     private Channel channel;
     private RabbitMqBasic rabbitMqBasic;
+    private boolean persistent;
 
-    public DefaultNullExchangeProducer(){}
+    public DefaultNullExchangeProducer() {
+        this(false);
+    }
+
+    public DefaultNullExchangeProducer(boolean persistent) {
+        this.persistent = persistent;
+    }
+
 
     @Override
     public void bindExchangeAndSend(MQMessageWrapper<String> wrapper, Set<String> routingKeys) {////就是发送到exchangeType=direct，并且queueName=routingKey.value的队列上
@@ -33,8 +43,9 @@ public class DefaultNullExchangeProducer implements ExchangeProducer<String> {
              * RabbitMQ默认有一个exchange，叫default exchange，它用一个空字符串表示，它是direct exchange类型，
              * 任何发往这个exchange的消息都会被路由到routing key的名字对应的队列上，如果没有对应的队列，则消息会被丢弃
              */
-            for(String routingKey : routingKeys) {//向空的交换机的多条队列发送消息
-                channel.basicPublish("", routingKey, null, wrapper.serialMessage());//routing key = 指定的routingKey
+            AMQP.BasicProperties basicProperties = persistent ? MessageProperties.PERSISTENT_TEXT_PLAIN : null;
+            for (String routingKey : routingKeys) {//向空的交换机的多条队列发送消息
+                channel.basicPublish("", routingKey, basicProperties, wrapper.serialMessage());//routing key = 指定的routingKey
                 System.out.println(String.format("发送消息[%s]", wrapper.getMessageBody()));
             }
         } catch (IOException e) {
@@ -55,13 +66,13 @@ public class DefaultNullExchangeProducer implements ExchangeProducer<String> {
          * 参数4：队列不再使用时是否自动删除（没有连接，并且没有未处理的消息)
          * 参数5：建立队列时的其他参数
          */
-        if(null == rabbitMqBasic.getExchangeName() || "".equals(rabbitMqBasic.getExchangeName())) {
+        if (null == rabbitMqBasic.getExchangeName() || "".equals(rabbitMqBasic.getExchangeName())) {
             /**
              * 其实第一个参数应该是取值queueName的，但是因为交换机指定为空，暨取值默认交换机，此时mq会将消息转给routingkey的名字对应的队列上，暨队列名字=routingkey的值
              */
             try {
                 Set<String> routingKeys = this.rabbitMqBasic.getRoutingKey();
-                for(String routingKey : routingKeys) {
+                for (String routingKey : routingKeys) {
                     this.channel.queueDeclare(routingKey, true, false, false, null);
                 }
             } catch (IOException e) {

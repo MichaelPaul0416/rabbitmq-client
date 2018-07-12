@@ -58,7 +58,7 @@ public class SimpleMessageProducerTest extends BaseRabbitmqTest {
     @Override
     protected void setExchanger() {
 //        messageInvoker.setExchange(new DefaultExchangeProducer());//exchange is not null
-        messageInvoker.setExchange(new DefaultNullExchangeProducer());//use default exchange --> routing message to the queue which name is the value of routing key
+        messageInvoker.setExchange(new DefaultNullExchangeProducer(true));//use default exchange --> routing message to the queue which name is the value of routing key
     }
 
 
