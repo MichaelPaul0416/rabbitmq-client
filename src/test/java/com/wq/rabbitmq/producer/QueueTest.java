@@ -24,6 +24,10 @@ public class QueueTest extends AbstractAmqpTest {
 
     private static final String FORWARD_DEAD_MESSAGE_EXCHANGE = "x-dead-letter-exchange";
 
+    private static final int DELAY_QUEUE_TIME = 20000;//20s
+
+    private static final int MAX_SIZE = 10;
+
     String delayExchange = "delay-exchange-one";
     String forwardDeadMessageExchange = "forward-dead-message-exchange";
     String delayQueue = "delay-message-queue";
@@ -54,8 +58,8 @@ public class QueueTest extends AbstractAmqpTest {
 
         //声明一个延迟队列
         Map<String, Object> delayQueueMap = new HashMap<>();
-        delayQueueMap.put(DELAY_QUEUE_TTL, 10000);
-        delayQueueMap.put(DELAY_QUEUE_MAX_SIZE, 10);
+        delayQueueMap.put(DELAY_QUEUE_TTL, DELAY_QUEUE_TIME);
+        delayQueueMap.put(DELAY_QUEUE_MAX_SIZE, MAX_SIZE);
         delayQueueMap.put(FORWARD_DEAD_MESSAGE_EXCHANGE, forwardDeadMessageExchange);
 
         channel.queueDeclare(delayQueue, true, false, false, delayQueueMap);
