@@ -80,7 +80,7 @@ public class SimpleMessageConsumerTest extends BaseRabbitmqTest {
 //        direct类型的Exchange
 //        ExchangeConsumer<String> exchangeConsumer = new DefaultExchangeConsumer(consumer);
         ExchangeConsumer<String> exchangeConsumer = new TopicExchangeConsumer(consumer);
-        ((SimpleMessageConsumer) super.messageInvoker).setExchange(exchangeConsumer);
+        super.messageInvoker.setExchange(exchangeConsumer);
     }
 
     @Test
